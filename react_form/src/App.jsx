@@ -1,34 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useForm } from "react-hook-form"
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm();
+
+  async function onSubmit(data){
+    console.log("Submitting the Form");
+    await new Promise((resolve) => {
+      setTimeout(resolve, 5000);
+    });
+    console.log("Form Data: ", data);
+  }
 
   return (
-    <>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <label>First Name: </label>
+        <input className={errors.firstName ? 'input-error' : ''} 
+        {...register('firstName', { 
+            required: true, 
+            minLength: { value: 3, message: 'Min length atleast 3'}, 
+            maxLength: { value: 6, message: 'Max length atmost 6'}
+          })
+        } />
+        {errors.firstName && <p className="errorMsg">{errors.firstName.message}</p>}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+      <div>
+        <label>Middle Name: </label>
+        <input {...register('middleName')} />
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+      <div>
+        <label>Last Name: </label>
+        <input className={errors.lastName ? 'input-error' : ''}
+        {...register('lastName', {
+            // pattern: {
+            //   value: /^[A-Za-z]+$/i,
+            //   message: 'Last Name is not as per the rules'
+            // }
+          })
+        } />
+        {errors.lastName && <p className="errorMsg">{errors.lastName.message}</p>}
+      </div>
+      <input type="submit" disabled={isSubmitting} value={isSubmitting ? "Submitting" : "Submit"} />
+    </form>
   )
 }
 
